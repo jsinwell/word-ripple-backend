@@ -89,7 +89,7 @@ app.get('/api/leaderboard', async (req, res) => {
         score, 
         timestamp,
         RANK() OVER (ORDER BY score DESC) as rank
-      FROM "public".scores
+      FROM \"public.scores\"
       ORDER BY score DESC
       LIMIT 10
     `);
