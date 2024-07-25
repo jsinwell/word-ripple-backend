@@ -56,7 +56,7 @@ app.post('/api/scores', verifyToken, async (req, res) => {
   try {
     // First get the user's current high score
     const currentScoreResult = await pool.query(
-      'SELECT score FROM word_ripple.public.scores WHERE user_id = $1',
+      'SELECT score FROM public.scores WHERE user_id = $1',
       [userId]
     );
 
@@ -65,7 +65,7 @@ app.post('/api/scores', verifyToken, async (req, res) => {
     // Only insert or update if the new score is higher
     if (score > currentHighScore) {
       const result = await pool.query(
-        'INSERT INTO word_ripple.public.scores (user_id, score, display_name) VALUES ($1, $2, $3) ON CONFLICT (user_id) DO UPDATE SET score = EXCLUDED.score, timestamp = CURRENT_TIMESTAMP RETURNING *',
+        'INSERT INTO public.scores (user_id, score, display_name) VALUES ($1, $2, $3) ON CONFLICT (user_id) DO UPDATE SET score = EXCLUDED.score, timestamp = CURRENT_TIMESTAMP RETURNING *',
         [userId, score, displayName]
       );
       console.log('Update result:', result.rows[0]);
@@ -89,7 +89,7 @@ app.get('/api/leaderboard', async (req, res) => {
         score, 
         timestamp,
         RANK() OVER (ORDER BY score DESC) as rank
-      FROM word_ripple.public.scores
+      FROM public.scores
       ORDER BY score DESC
       LIMIT 10
     `);
@@ -119,7 +119,7 @@ app.get('/api/journey/check', verifyToken, async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT last_completed_date FROM word_ripple.public.user_journeys WHERE user_id = $1',
+      'SELECT last_completed_date FROM public.user_journeys WHERE user_id = $1',
       [userId]
     );
 
@@ -143,7 +143,7 @@ app.post('/api/journey/complete', verifyToken, async (req, res) => {
 
   try {
     await pool.query(
-      'INSERT INTO word_ripple.public.user_journeys (user_id, last_completed_date) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET last_completed_date = EXCLUDED.last_completed_date',
+      'INSERT INTO public.user_journeys (user_id, last_completed_date) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET last_completed_date = EXCLUDED.last_completed_date',
       [userId, today]
     );
     res.status(201).json({ message: 'Journey completion recorded' });
