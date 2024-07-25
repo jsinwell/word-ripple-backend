@@ -2,6 +2,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
 const admin = require('firebase-admin');
+const fs = require('fs');
 require('dotenv').config();
 
 const app = express();
