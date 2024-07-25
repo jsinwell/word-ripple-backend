@@ -82,22 +82,11 @@ app.post('/api/scores', verifyToken, async (req, res) => {
 app.get('/api/leaderboard', async (req, res) => {
   try {
     console.log('Executing leaderboard query...');
-    const query = `
-    SELECT 
-    \"user_id\",
-    \"display_name\", 
-    \"score\", 
-    \"timestamp\",
-    RANK() OVER (ORDER BY \"score\" DESC) as \"rank\"
-  FROM \"public\".\"scores\"
-  ORDER BY \"score\" DESC
-  LIMIT 10;
-  `;
-  console.log('Query:', query);
-  const result = await pool.query(query);
-  console.log('Leaderboard query result:', result.rows);
-  res.json(result.rows);
-
+    const result = await pool.query(`
+      SELECT NOW()
+    `);
+    console.log('Leaderboard query result:', result.rows);
+    res.json(result.rows);
   } catch (error) {
     console.error('Error in /api/leaderboard:', error);
     res.status(500).json({ message: error.message });
