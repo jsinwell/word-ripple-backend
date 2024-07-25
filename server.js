@@ -84,13 +84,13 @@ app.get('/api/leaderboard', async (req, res) => {
     console.log('Executing leaderboard query...');
     const result = await pool.query(`
       SELECT 
-        "user_id",
-        "display_name", 
-        "score", 
-        "timestamp",
-        RANK() OVER (ORDER BY "score" DESC) as "rank"
-      FROM "public"."scores"
-      ORDER BY "score" DESC
+        user_id,
+        display_name, 
+        score, 
+        timestamp,
+        RANK() OVER (ORDER BY score DESC) as rank
+      FROM public."scores"
+      ORDER BY score DESC
       LIMIT 10
     `);
     console.log('Leaderboard query result:', result.rows);
