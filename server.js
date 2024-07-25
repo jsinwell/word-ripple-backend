@@ -81,7 +81,7 @@ app.post('/api/scores', verifyToken, async (req, res) => {
 // Route to get top scores
 app.get('/api/leaderboard', async (req, res) => {
   try {
-    // Select the top 10 user scores from our database
+    console.log('Executing leaderboard query...');
     const result = await pool.query(`
       SELECT 
         user_id, 
@@ -93,8 +93,10 @@ app.get('/api/leaderboard', async (req, res) => {
       ORDER BY score DESC
       LIMIT 10
     `);
+    console.log('Leaderboard query result:', result.rows);
     res.json(result.rows);
   } catch (error) {
+    console.error('Error in /api/leaderboard:', error);
     res.status(500).json({ message: error.message });
   }
 });
