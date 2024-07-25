@@ -99,6 +99,17 @@ app.get('/api/leaderboard', async (req, res) => {
   }
 });
 
+app.get('/api/test-db', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT NOW()');
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Database connection error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
 /// Route to check if user completed journey today
 app.get('/api/journey/check', verifyToken, async (req, res) => {
   const userId = req.user.uid;
