@@ -11,24 +11,19 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-console.log('FIREBASE_SERVICE_ACCOUNT:', process.env.FIREBASE_SERVICE_ACCOUNT);
-
 let serviceAccount;
-try {
-  if (process.env.FIREBASE_SERVICE_ACCOUNT.startsWith('{')) {
-    // If it starts with '{', assume it's the JSON content
-    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-  } else {
-    // Otherwise, assume it's a file path
-    console.log('Reading from file:', process.env.FIREBASE_SERVICE_ACCOUNT);
-    const fileContent = fs.readFileSync(process.env.FIREBASE_SERVICE_ACCOUNT, 'utf8');
-    console.log('File content:', fileContent);
-    serviceAccount = JSON.parse(fileContent);
-  }
-  console.log('Service account parsed successfully');
-} catch (error) {
-  console.error('Error parsing service account:', error);
+if (process.env.FIREBASE_SERVICE_ACCOUNT.startsWith('{')) {
+  // If it starts with '{', assume it's the JSON content
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+} else {
+  // Otherwise, assume it's a file path
+  serviceAccount = JSON.parse(fs.readFileSync(process.env.FIREBASE_SERVICE_ACCOUNT, 'utf8'));
 }
+
+// Initialize Firebase Admin SDK
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
 // Set up PostgreSQL connection
 const pool = new Pool({
