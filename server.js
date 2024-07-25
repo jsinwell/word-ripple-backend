@@ -33,7 +33,6 @@ const pool = new Pool({
   connectionString: connectionString,
   ssl: isProduction ? { rejectUnauthorized: false } : false
 });
-
 // Middleware to verify Firebase token
 const verifyToken = async (req, res, next) => {
   const idToken = req.headers.authorization;
@@ -45,6 +44,15 @@ const verifyToken = async (req, res, next) => {
     res.status(403).send('Unauthorized');
   }
 };
+
+// Add this debugging query
+pool.query('SELECT current_database(), current_schema(), current_user', (err, res) => {
+  if (err) {
+    console.error('Error checking database connection:', err);
+  } else {
+    console.log('Database connection info:', res.rows[0]);
+  }
+});
 
 // Route to save a new score
 app.post('/api/scores', verifyToken, async (req, res) => {
@@ -80,22 +88,15 @@ app.post('/api/scores', verifyToken, async (req, res) => {
 });
 
 // Route to get top scores
+// In your /api/leaderboard route
 app.get('/api/leaderboard', async (req, res) => {
   try {
-    // Select the top 10 user scores from our database
-    const result = await pool.query(`
-      SELECT 
-        user_id, 
-        display_name, 
-        score, 
-        timestamp,
-        RANK() OVER (ORDER BY score DESC) as rank
-      FROM scores
-      ORDER BY score DESC
-      LIMIT 10
-    `);
+    console.log('Fetching leaderboard...');
+    const result = await pool.query('SELECT * FROM scores ORDER BY score DESC LIMIT 10');
+    console.log('Leaderboard result:', result.rows);
     res.json(result.rows);
   } catch (error) {
+    console.error('Error fetching leaderboard:', error);
     res.status(500).json({ message: error.message });
   }
 });
