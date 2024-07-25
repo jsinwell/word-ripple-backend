@@ -26,9 +26,12 @@ admin.initializeApp({
 });
 
 // Set up PostgreSQL connection
+const isProduction = process.env.NODE_ENV === 'production';
+const connectionString = process.env.DATABASE_URL;
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  connectionString: connectionString,
+  ssl: isProduction ? { rejectUnauthorized: false } : false
 });
 
 // Middleware to verify Firebase token
