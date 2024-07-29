@@ -31,7 +31,10 @@ const connectionString = process.env.DATABASE_URL;
 
 const pool = new Pool({
   connectionString: connectionString,
-  ssl: isProduction ? { rejectUnauthorized: false } : false
+  ssl: isProduction ? { rejectUnauthorized: false } : false,
+  options: { 
+    search_path: 'public' 
+  }
 });
 // Middleware to verify Firebase token
 const verifyToken = async (req, res, next) => {
@@ -82,14 +85,15 @@ app.post('/api/scores', verifyToken, async (req, res) => {
 app.get('/api/leaderboard', async (req, res) => {
   try {
     console.log('Executing leaderboard query...');
+    console.log('Pool configuration:', pool.options);
     const result = await pool.query(`
       SELECT 
-        user_id,
+        user_id, 
         display_name, 
         score, 
         timestamp,
         RANK() OVER (ORDER BY score DESC) as rank
-      FROM \"public.scores\"
+      FROM public.scores
       ORDER BY score DESC
       LIMIT 10
     `);
@@ -97,7 +101,8 @@ app.get('/api/leaderboard', async (req, res) => {
     res.json(result.rows);
   } catch (error) {
     console.error('Error in /api/leaderboard:', error);
-    res.status(500).json({ message: error.message });
+    console.error('Error details:', error.stack);
+    res.status(500).json({ message: error.message, stack: error.stack });
   }
 });
 
