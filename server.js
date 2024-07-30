@@ -29,13 +29,13 @@ admin.initializeApp({
 const isProduction = process.env.NODE_ENV === 'production';
 const connectionString = process.env.DATABASE_URL;
 
-const pool = new Pool({
+const poolConfig = {
   connectionString: connectionString,
-  ssl: isProduction ? { rejectUnauthorized: false } : false,
-  options: { 
-    search_path: 'public' 
-  }
-});
+  ssl: isProduction ? { rejectUnauthorized: false } : false
+};
+
+const pool = new Pool(poolConfig);
+
 // Middleware to verify Firebase token
 const verifyToken = async (req, res, next) => {
   const idToken = req.headers.authorization;
