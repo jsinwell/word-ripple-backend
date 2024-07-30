@@ -71,10 +71,9 @@ app.post('/api/scores', verifyToken, async (req, res) => {
         'INSERT INTO public.scores (user_id, score, display_name) VALUES ($1, $2, $3) ON CONFLICT (user_id) DO UPDATE SET score = EXCLUDED.score, timestamp = CURRENT_TIMESTAMP RETURNING *',
         [userId, score, displayName]
       );
-      console.log('Update result:', result.rows[0]);
       res.status(201).json(result.rows[0]);
     } else {
-      res.status(200).json({ message: 'Score not updated as it\'s not higher than the current high score.' });
+      res.status(200).json({ message: 'Score not updated as its not higher than the current high score' });
     }
   } catch (error) {
     console.error('Error in /api/scores:', error);
@@ -96,7 +95,6 @@ app.get('/api/leaderboard', async (req, res) => {
       ORDER BY score DESC
       LIMIT 10
     `);
-    console.log('Leaderboard query result:', result.rows);
     res.json(result.rows);
   } catch (error) {
     console.error('Error in /api/leaderboard:', error);
